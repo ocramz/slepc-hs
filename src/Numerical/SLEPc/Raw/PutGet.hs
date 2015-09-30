@@ -11,8 +11,27 @@ import Control.Concurrent
 import Control.Exception
 
 
+-- * Vec
+
+
+
+
+-- * Mat
+
+
+
+
+-- * EPS
+
+
+
 
 
 -- * SLEPc misc
 
--- withSlepc0 = bracketChk slepcInit01 slepcFin1
+withSlepc0 = bracket_ slepcInit01 slepcFin1
+
+
+
+commWorld = commWorld1
+commSelf = commSelf1

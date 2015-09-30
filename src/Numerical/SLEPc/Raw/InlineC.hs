@@ -156,6 +156,12 @@ svdDestroy' s = with s $ \sp -> [C.exp|int{SVDDestroy($(SVD* sp))}|]
 
 
 
+
+
+
+
+
+
 -- * SLEPc misc
 
 -- SlepcInitialize(int *argc,char ***argv,char *file,char *help);
@@ -199,3 +205,31 @@ withSlepc' :: Argv -> OptsStr -> HelpStr -> IO a -> IO a
 withSlepc' a o h = bracket_ (slepcInitialize1 a o h) slepcFin1
 
 withSlepc'' a o h f = slepcInitialize1 a o h >> (f `finally` slepcFin1)
+
+
+
+
+
+
+
+
+-- * MPI misc
+
+mpiCommSize' comm = withPtr (\p -> [C.exp| int{ MPI_Comm_size($(int c), $(int *p))}|] )
+  where
+   c = unComm comm
+-- mpiCommSize c =  unsafePerformIO $ mpiCommSize' c 
+
+mpiCommRank' comm =
+  withPtr
+   (\p ->
+     [C.exp| int{ MPI_Comm_rank($(int c), $(int *p))}|] ) 
+  where
+   c = unComm comm
+
+-- mpiCommRank c = MkRank $ unsafePerformIO $ mpiCommRank' c 
+
+
+{-# NOINLINE commWorld1 #-}
+commWorld1 = Comm $ unsafePerformIO [C.exp| int{ MPI_COMM_WORLD }  |] 
+commSelf1 = Comm $ unsafePerformIO [C.exp| int{ MPI_COMM_SELF }  |]

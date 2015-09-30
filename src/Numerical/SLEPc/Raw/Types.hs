@@ -85,6 +85,7 @@ epsTypeToString t =
 data EpsProblemType_ = EpsHep | EpsGHep | EpsNHep | EpsGNHep | EpsPGNHep | EpsGHIep
                      deriving (Eq, Show, Enum)
 
+epsProblemTypeToInt EpsHep = 1
 epsProblemTypeToInt x = fromEnum (x :: EpsProblemType_ )
 
 
