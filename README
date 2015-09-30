@@ -2,6 +2,15 @@ slepc-hs - Haskell bindings for SLEPc
 (Scalable Library for Eigenvalue Problem Computations)
 Copyright (c) 2015, Marco Zocca ( zocca at marco dot gmail at com )
 
+## Introduction
+
+The [SLEPc](http://slepc.upv.es/) library provides a standardized interface for eigenvalue problems of various kind (linear, nonlinear, symmetric or not, real- or complex-valued), and several solvers, along with a rich option set. It is based on the [PETSc](http://www.mcs.anl.gov/petsc/) architecture that comprises distributed numerical data-structures and algorithms, which in turn is based on MPI, to support parallelized computations.
+
+ 
+
+
+## License
+
 slepc-hs is free software: you can redistribute it and/or modify it under the
 terms of version 3 of the GNU Lesser General Public License as published by
 the Free Software Foundation.
