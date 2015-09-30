@@ -44,7 +44,7 @@ It is your humble author's opinion that dynamic languages do not completely addr
 
 ## Notes
 
-* The library is being developed on a Unix, on top of PETSc 3.6.0 and SLEPc 3.6.1 using MPICH (installed via the PETSc installation process).
+* The library is being developed on a Unix, with the Haskell compiler GHC 7.8.4, on top of PETSc 3.6.0 and SLEPc 3.6.1 using MPICH (installed via the PETSc installation process).
 
 * The PETSc and SLEPc architecture directory flags within the makefile are hardcoded ("arch-darwin-c-debug"), but they depend on the actual configuration parameters you supplied when installing those libraries ; modify them to suit your case.
 
