@@ -17,10 +17,10 @@ main:
 	make step3
 
 step1:
-	ghc  ${SRCDIR}/Internal.hs ${SRCDIR}/Raw/InlineC.hs -isrc/
+	ghc  ${SRCDIR}/Raw/Internal.hs ${SRCDIR}/Raw/InlineC.hs -isrc/
 
 step2a:
-	cc -c ${SRCDIR}/Internal.c -o ${LIBDIR}/Internal_c.o -I${SLEPC_DIR_ARCH}/include -I${SLEPC_DIR}/include 
+	cc -c ${SRCDIR}/Raw/Internal.c -o ${LIBDIR}/Internal_c.o -I${SLEPC_DIR_ARCH}/include -I${SLEPC_DIR}/include 
 
 step2b:
 	cc -c ${SRCDIR}/Raw/InlineC.c -o ${LIBDIR}/InlineC_c.o -I${SLEPC_DIR_ARCH}/include -I${SLEPC_DIR}/include -I${PETSC_DIR}/include -I${PETSC_DIR_ARCH}/include

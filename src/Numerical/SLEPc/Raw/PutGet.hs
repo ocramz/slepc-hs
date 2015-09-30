@@ -4,7 +4,7 @@ import Numerical.SLEPc.Raw.InlineC
 import Numerical.SLEPc.Raw.Types
 import Numerical.SLEPc.Raw.Utils
 import Numerical.SLEPc.Raw.Exception
-import Numerical.SLEPc.Internal
+import Numerical.SLEPc.Raw.Internal
 
 import Control.Monad
 import Control.Concurrent

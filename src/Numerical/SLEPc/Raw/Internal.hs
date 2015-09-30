@@ -4,7 +4,7 @@
 {-# LANGUAGE StandaloneDeriving #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DataKinds #-}
-module Numerical.SLEPc.Internal
+module Numerical.SLEPc.Raw.Internal
        where
 
 -- import Numerical.PETSc.Types

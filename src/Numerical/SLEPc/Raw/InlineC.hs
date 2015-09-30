@@ -2,7 +2,7 @@
 module Numerical.SLEPc.Raw.InlineC where
 -- | foreign signatures, + everything that requires an inline-c pass
 
-import Numerical.SLEPc.Internal
+import Numerical.SLEPc.Raw.Internal
 
 import Numerical.SLEPc.Raw.Types
 import Numerical.SLEPc.Raw.Utils
