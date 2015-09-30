@@ -1,17 +1,11 @@
 {-# LANGUAGE QuasiQuotes, TemplateHaskell #-}
 module Numerical.SLEPc.Raw.InlineC where
-
-
 -- | foreign signatures, + everything that requires an inline-c pass
 
 import Numerical.SLEPc.Internal
 
--- import Numerical.PETSc.Raw
-
 import Numerical.SLEPc.Raw.Types
 import Numerical.SLEPc.Raw.Utils
--- import Numerical.PETSc.Raw.
-
 
 import Language.C.Inline as C
 import Language.C.Inline.Context
@@ -34,13 +28,9 @@ context petscCtx
 
 C.include "<slepceps.h>"
 C.include "<slepcsvd.h>"
--- C.include "<petsctao.h>"
--- C.include "<petscdm.h>"
--- C.include "<petscdmda.h>"
--- C.include "<petscts.h>"
 
 
-petscDecide = -1
+-- petscDecide = -1           -- don't ask
 
 
 
@@ -171,10 +161,7 @@ svdDestroy' s = with s $ \sp -> [C.exp|int{SVDDestroy($(SVD* sp))}|]
 -- SlepcInitialize(int *argc,char ***argv,char *file,char *help);
 -- ierr = SlepcFinalize();
 
-
--- PETSC_EXTERN PetscErrorCode PetscInitialized(PetscBool *);
-
-slepcInitialized = withPtr ( \b ->
+slepcInitialized' = withPtr ( \b ->
      [C.exp|int{ SlepcInitialized($(PetscBool * b)) } |] )   
 
   
@@ -182,8 +169,6 @@ slepcInitialized = withPtr ( \b ->
 
 
 slepcInit01 = [C.exp| int{ SlepcInitializeNoArguments()  }|]
-
--- -- PETSC_EXTERN PetscErrorCode PetscInitialize(int*,char***,const char[],const char[]);
 
 slepcInitialize1 args opts help = 
  let acc = fromIntegral $ length args in 
@@ -200,22 +185,15 @@ type HelpStr = String
 
 slepcFin1 = [C.block| int{ SlepcFinalize(); }|] 
 
-withSlepc01 f = do -- returns IO ()
+withSlepc01 f = do    -- returns IO ()
   slepcInit01
   f
   slepcFin1
 
--- withPetsc01', withPetsc0'' :: IO a -> IO a
 withPetsc0'' f =
   slepcInit01 >> (f `finally` slepcFin1)
   
-withSlepc01' = bracket_ slepcInit01 slepcFin1 -- returns IO a
-
--- withPetsc :: Argv -> OptsStr -> HelpStr -> IO a -> IO ()
--- withPetsc argv opts help f = do
---   petscInitialize argv opts help
---   f
---   petscFin
+withSlepc01' = bracket_ slepcInit01 slepcFin1 
 
 withSlepc' :: Argv -> OptsStr -> HelpStr -> IO a -> IO a
 withSlepc' a o h = bracket_ (slepcInitialize1 a o h) slepcFin1
