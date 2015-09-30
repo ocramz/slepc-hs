@@ -2,15 +2,23 @@ slepc-hs - Haskell bindings for SLEPc
 (Scalable Library for Eigenvalue Problem Computations)
 Copyright (c) 2015, Marco Zocca ( zocca at marco dot gmail at com )
 
+
+
 ## Introduction
 
 The [SLEPc](http://slepc.upv.es/) library provides a standardized interface for eigenvalue problems of various kind (linear, nonlinear, symmetric or not, real- or complex-valued), and several solvers, along with a rich option set. It is based on the [PETSc](http://www.mcs.anl.gov/petsc/) architecture that comprises distributed numerical data-structures and algorithms, which in turn is based on MPI, to support parallelized computations.
+
+
 
 ## Motivation
 
 Eigenproblems, i.e. equations of the form `A x = s x`, where `A` is an operator (e.g. a matrix, in the linear, finite-dimensional case), `x` an eigenvector and `s` a number (the corresponding eigenvalue), are ubiquitous in science and engineering; their interpretation is fairly intuitive: the action of `A` on `x` produces another vector `s x` which is simply proportional to the original one. 
 
-The set of eigenvectors represent a natural basis in which to express the operator `A` (and the set of eigenvalues can be seen as the amplitude coefficients of each element of this basis), and "projecting" a phenomenon onto one or more of the eigenvectors of the operator that generates it highlights its symmetries (for enlightening examples and all the relevant theory, see e.g. the "modal expansion" in quantum mechanics/acoustics/photonics, Principal Component Analysis in statistics, etc).
+The set of eigenvectors represent a natural basis in which to express the operator `A` (and the set of eigenvalues can be seen as the amplitude coefficients of each element of this basis), and "projecting" a phenomenon onto one or more of the eigenvectors of the operator that generates it highlights its symmetries.
+
+For enlightening examples and all the relevant theory, see e.g. the "modal expansion" in quantum mechanics/acoustics/photonics, Principal Component Analysis in statistics, etc.
+
+
 
 
 ## Vision
@@ -21,16 +29,28 @@ We believe that dynamic languages do not completely address the needs of scienti
  
 
 
+
+
 ## Installation
 
-* First of all, working installations of PETSc and SLEPc are required, in this order. Please refer to the respective pages for detailed instructions.
+* First of all, working installations of PETSc and SLEPc (and Haskell, of course) are required, in this order. Please refer to the respective pages for detailed instructions.
 
-* The Haskell side is based on `inline-c`, which can be obtained from Hackage.
+* The Haskell side is based on `inline-c`, which can be obtained from Hackage via `cabal install inline-c`.
+
+* Once everything is setup simply run `make` from within the slepc-hs root directory, and at the end of the process you should find yourself within a GHCi interactive session.
+
+
 
 
 ## Notes
 
-The library is being developed on top of PETSc 3.6.0 and SLEPc 3.6.1 using MPICH (installed via the PETSc installation process)
+* The library is being developed on a Unix, on top of PETSc 3.6.0 and SLEPc 3.6.1 using MPICH (installed via the PETSc installation process).
+
+* The PETSc and SLEPc architecture directory flags within the makefile are hardcoded ("arch-darwin-c-debug"), but they depend on the actual configuration parameters you supplied when installing those libraries ; modify them to suit your case.
+
+
+
+
 
 ## License
 
