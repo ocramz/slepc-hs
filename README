@@ -12,11 +12,11 @@ The [SLEPc](http://slepc.upv.es/) library provides a standardized interface for 
 
 ## Motivation
 
-Eigenproblems, i.e. equations of the form `A x = s x`, where `A` is an operator (e.g. a matrix, in the linear, finite-dimensional case), `x` an eigenvector and `s` a number (the corresponding eigenvalue), are ubiquitous in science and engineering; their interpretation is fairly intuitive: the action of `A` on `x` produces another vector `s x` which is simply proportional to the original one. 
+Eigenproblems, i.e. equations of the form `A x = s x`, where `A` is an operator (e.g. a matrix, in the linear, finite-dimensional case), `x` an eigenvector and `s` a number (the corresponding eigenvalue), are ubiquitous in science and engineering; their interpretation is fairly intuitive: the action of `A` on `x` produces another vector `s x` which is simply proportional to the original one. In other words, eigenvectors form a set of "natural directions" of the operator `a`, a natural basis in which to express it (and the set of eigenvalues `s` can be seen as the amplitude coefficients of each element of this basis). 
 
-The set of eigenvectors represent a natural basis in which to express the operator `A` (and the set of eigenvalues can be seen as the amplitude coefficients of each element of this basis), and "projecting" a phenomenon onto one or more of the eigenvectors of the operator that generates it highlights its symmetries.
+"Projecting" a phenomenon onto one or more of the eigenvectors of the operator that generates it highlights its symmetries.
 
-For enlightening examples and all the relevant theory, see e.g. the "modal expansion" in quantum mechanics/acoustics/photonics, Principal Component Analysis in statistics, etc.
+For enlightening examples and all the relevant theory, see e.g. the "modal expansion" in quantum mechanics/acoustics/photonics, or Principal Component Analysis in statistics, etc. 
 
 
 
