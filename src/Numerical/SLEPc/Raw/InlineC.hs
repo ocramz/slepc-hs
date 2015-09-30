@@ -141,11 +141,9 @@ svdSolve' s = [C.exp|int{SVDSolve($(SVD s))}|]
 svdGetConverged' s = withPtr $ \n -> [C.exp|int{SVDGetConverged($(SVD s),$(int* n))}|]
 
 -- SVDGetSingularTriplet(SVD svd,int i,PetscReal *sigma,Vec u,Vec v);
-svdGetSingularTriplet' s i =
+svdGetSingularTriplet' s i u v =
   withPtr $ \sig ->
-   withPtr $ \u ->
-    withPtr $ \v -> 
-  [C.exp|int{SVDGetSingularTriplet($(SVD s),$(int i),$(PetscReal* sig),$(Vec* u),$(Vec* v))}|]
+  [C.exp|int{SVDGetSingularTriplet($(SVD s),$(int i),$(PetscReal* sig),$(Vec u),$(Vec v))}|]
 
 -- SVDDestroy(SVD svd);
 svdDestroy' s = with s $ \sp -> [C.exp|int{SVDDestroy($(SVD* sp))}|]
@@ -176,7 +174,7 @@ slepcInitialized' = withPtr ( \b ->
 
 slepcInit01 = [C.exp| int{ SlepcInitializeNoArguments()  }|]
 
-slepcInitialize1 args opts help = 
+slepcInitialize' args opts help = 
  let acc = fromIntegral $ length args in 
   with acc $ \ac ->
    withCStringArray args $ \aa ->
@@ -202,9 +200,9 @@ withPetsc0'' f =
 withSlepc01' = bracket_ slepcInit01 slepcFin1 
 
 withSlepc' :: Argv -> OptsStr -> HelpStr -> IO a -> IO a
-withSlepc' a o h = bracket_ (slepcInitialize1 a o h) slepcFin1
+withSlepc' a o h = bracket_ (slepcInitialize' a o h) slepcFin1
 
-withSlepc'' a o h f = slepcInitialize1 a o h >> (f `finally` slepcFin1)
+withSlepc'' a o h f = slepcInitialize' a o h >> (f `finally` slepcFin1)
 
 
 

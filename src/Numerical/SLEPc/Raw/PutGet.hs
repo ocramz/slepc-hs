@@ -59,10 +59,33 @@ epsView e viewer = chk0 $ epsView' e viewer
 
 
 
+-- * SVD
+
+withSvd :: Comm -> (SVD -> IO a) -> IO a
+withSvd comm = bracketChk (svdCreate' comm) svdDestroy'
+
+withSvdSetup :: Comm -> Mat -> (SVD -> IO a) -> IO a
+withSvdSetup comm oper act = withSvd comm $ \s -> do
+  chk0 $ svdSetOperator' s oper
+  act s
+
+withSvdSetupSolve :: Comm -> Mat -> (SVD -> IO a) -> IO a
+withSvdSetupSolve comm oper postsolve = withSvdSetup comm oper $ \s -> do
+  chk0 $ svdSolve' s
+  postsolve s
+  
+
+
+
+
+
 
 
 
 -- * SLEPc misc
+
+slepcInit :: Argv -> OptsStr -> HelpStr -> IO ()
+slepcInit a o h = chk0 $ slepcInitialize' a o h
 
 slepcInit0, slepcFin :: IO ()
 slepcInit0 = chk0 slepcInit01
@@ -72,6 +95,9 @@ slepcFin = chk0 slepcFin1
 -- | FIXME: move into specialized monad
 withSlepc0 :: IO a -> IO a
 withSlepc0 = bracket_ slepcInit0 slepcFin
+
+withSlepc :: Argv -> OptsStr -> HelpStr -> IO a -> IO a
+withSlepc a o h = bracket_ (slepcInit a o h) slepcFin
 
 
 commWorld, commSelf :: Comm

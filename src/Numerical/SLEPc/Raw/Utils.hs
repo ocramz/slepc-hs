@@ -63,3 +63,7 @@ fi = fromIntegral
 
 toCInt :: Int -> CInt
 toCInt = CInt . fromIntegral
+
+
+fromPetscBool :: CInt -> Bool
+fromPetscBool = toBool . fromIntegral
