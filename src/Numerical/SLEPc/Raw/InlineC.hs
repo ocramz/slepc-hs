@@ -24,7 +24,7 @@ import qualified Foreign.ForeignPtr.Safe         as FPS
 
 import System.IO.Unsafe (unsafePerformIO)
 
-context petscCtx
+context slepcCtx
 
 C.include "<slepceps.h>"
 C.include "<slepcsvd.h>"
@@ -89,7 +89,7 @@ epsSetInterval' e smin smax = [C.exp|int{EPSSetInterval($(EPS e),$(PetscReal smi
 epsDestroy' e = with e $ \ep -> [C.exp|int{EPSDestroy($(EPS* ep))}|]
 
 -- PetscErrorCode EPSView(EPS eps,PetscViewer viewer)
-epsView1 eps v = [C.exp|int{EPSView($(EPS eps),$(PetscViewer v))}|]
+epsView' eps v = [C.exp|int{EPSView($(EPS eps),$(PetscViewer v))}|]
 
 
 

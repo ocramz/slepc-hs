@@ -10,33 +10,24 @@ module Numerical.SLEPc.Raw.Internal
 -- import Numerical.PETSc.Types
   --(PetscInt, PetscBool, PetscReal, PetscScalar)
 
-import Control.Exception as E
-import Data.Typeable
-import qualified Language.C.Inline as C
 import qualified Language.C.Types as CT
 import Foreign.C.Types
-import Foreign.C.String
 import Foreign
 import qualified Language.Haskell.TH as TH
+import Language.C.Inline
 import Language.C.Inline.Context
 import Data.Monoid ((<>), mempty)
 import Control.Monad (unless, when, liftM)
-import Control.Concurrent
 import qualified Data.Map as Map
-import Language.C.Inline
 
-import qualified Data.Vector.Storable.Mutable as V
 
-C.include "<stdio.h>"
-C.include "<math.h>"
+-- * inline-c SLEPc Context (type maps)
+slepcCtx :: Context
+slepcCtx = baseCtx <> funCtx <> vecCtx <> ctx where
+  ctx = mempty {ctxTypesTable = slepcTypesTable}
 
--- * inline-c PETSc Context (type maps)
-petscCtx :: Context
-petscCtx = baseCtx <> funCtx <> vecCtx <> ctx where
-  ctx = mempty {ctxTypesTable = petscTypesTable}
-
-petscTypesTable :: Map.Map CT.TypeSpecifier TH.TypeQ
-petscTypesTable = Map.fromList
+slepcTypesTable :: Map.Map CT.TypeSpecifier TH.TypeQ
+slepcTypesTable = Map.fromList
                   [
                     (typeNameId "PetscInt", [t| PetscInt_ |] )
                   , (typeNameId "PetscReal", [t| PetscReal_ |])  
