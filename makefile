@@ -30,15 +30,3 @@ step3:
 
 
 
-
-
-# main: 
-# 	# c2hs ${SRCDIR}/Types.chs  -C -I${PETSC_DIR_ARCH}/include -C -I${PETSC_DIR}/include 
-# 	# # # ghc -c -dynamic ${SRCDIR}/Internal2.hs ${SRCDIR}/Test2.hs 
-# 	# ghc ${SRCDIR}/Internal2.hs ${SRCDIR}/Test2.hs 
-# 	ghc  ${SRCDIR}/Internal.hs ${SRCDIR}/Raw/InlineC.hs -isrc/
-
-# 	cc -c ${SRCDIR}/Internal.c -o ${LIBDIR}/Internal_c.o -I${SLEPC_DIR_ARCH}/include -I${SLEPC_DIR}/include
-# 	cc -c ${SRCDIR}/Raw/InlineC.c -o ${LIBDIR}/InlineC_c.o -I${SLEPC_DIR_ARCH}/include -I${SLEPC_DIR}/include
-
-# 	ghci ${SRCDIR}/TestMain.hs ${SRCDIR}/Raw/InlineC.hs  ${LIBDIR}/InlineC_c.o  ${LIBDIR}/Internal_c.o -isrc/ -L${SLEPC_DIR_ARCH}/lib -lpetsc -lmpich
