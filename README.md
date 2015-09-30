@@ -6,7 +6,7 @@ Copyright (c) 2015, Marco Zocca ( zocca at marco dot gmail at com )
 
 ## Introduction
 
-The [SLEPc](http://slepc.upv.es/) library provides a standardized interface for eigenvalue problems of various kind (linear, nonlinear, symmetric or not, real- or complex-valued), and several solvers, along with a rich option set. It is based on the [PETSc](http://www.mcs.anl.gov/petsc/) architecture that comprises distributed numerical data-structures and algorithms, which in turn is based on MPI, to support parallelized computations.
+The [SLEPc](http://slepc.upv.es/) library provides a unified interface for eigenvalue problems of various kind (linear, nonlinear, symmetric or not, real- or complex-valued, etc.), and several solvers, along with a rich option set. It is based on the [PETSc](http://www.mcs.anl.gov/petsc/) architecture that comprises distributed numerical data-structures and algorithms, which in turn is based on MPI, to support parallelized computations.
 
 
 
