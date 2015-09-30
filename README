@@ -23,9 +23,9 @@ For enlightening examples and all the relevant theory, see e.g. the "modal expan
 
 ## Vision
 
-The with this library is manifold: to bring together functional programming and high-performance numerical computing, and in particular to bring concepts and tools from the former into the practice of the latter.
+The grand aim of this library is manifold: to bring together functional programming and high-performance numerical computing, and in particular to bring concepts and tools from the former into the practice of the latter.
 
-We believe that dynamic languages do not completely address the needs of scientific programming: ease of design, verification and collaboration. Functional composition of sub-programs and rich, static types are the missing link between programmer efficiency and program expressiveness.
+It is your humble author's opinion that dynamic languages do not completely address the needs of scientific programming: ease of design, of verification and of collaboration. Functional composition of sub-programs and rich, static types are the missing link between programmer efficiency and program expressiveness.
  
 
 
