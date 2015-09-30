@@ -62,30 +62,7 @@ petscTypesTable = Map.fromList
                   , (typeNameId "FN", [t| FN |])
                   , (typeNameId "RG", [t| RG |])  
                     
-                    
-                  -- , (typeNameId "DM", [t| DM |] )
-                  -- -- , (typeNameId "DMBoundaryType", [t| DMBoundaryType_ |]) 
-                  -- -- , (typeNameId "DMDAStencilType", [t| DMDAStencilType |])
-                  -- -- , (typeNameId "DMDAInterpolationType", [t| DMDAInterpolationType |])
-                  -- -- , (typeNameId "DMDAElementType", [t|DMDAElementType|])  
-                    
                   -- , (typeNameId "KSP", [t| KSP |])
-                  -- -- , (typeNameId "KSPType", [t| KSPType |])
-                  -- -- , (typeNameId "KSPConvergedReason", [t| KSPConvergedReason|])
-
-                  -- , (typeNameId "SNES", [t| SNES |])
-                  -- , (typeNameId "SNESLineSearch", [t| SNESLineSearch|])  
-
-                  -- , (typeNameId "PF", [t| PF |])
-
-                  -- , (typeNameId "PetscSpace", [t| PetscSpace |])
-                  -- , (typeNameId "PetscDualSpace", [t| PetscDualSpace |])
-                  -- , (typeNameId "PetscFE", [t| PetscFE|])
-                  -- , (typeNameId "PetscQuadrature", [t| PetscQuadrature |])  
-                    
-                  -- , (typeNameId "TS", [t| TS |])
-                   
-                  -- , (typeNameId "Tao", [t| Tao |])
 
                   , (typeNameId "PetscViewer", [t| PetscViewer |])
                   ]
