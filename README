@@ -6,7 +6,24 @@ Copyright (c) 2015, Marco Zocca ( zocca at marco dot gmail at com )
 
 The [SLEPc](http://slepc.upv.es/) library provides a standardized interface for eigenvalue problems of various kind (linear, nonlinear, symmetric or not, real- or complex-valued), and several solvers, along with a rich option set. It is based on the [PETSc](http://www.mcs.anl.gov/petsc/) architecture that comprises distributed numerical data-structures and algorithms, which in turn is based on MPI, to support parallelized computations.
 
+## Motivation
 
+Eigenproblems, i.e. equations of the form `A x = s x`, where `A` is an operator (e.g. a matrix, in the linear, finite-dimensional case), `x` an eigenvector and `s` a number (the corresponding eigenvalue), are ubiquitous in science and engineering; their interpretation is fairly intuitive: the action of `A` on `x` produces another vector `s x` which is simply proportional to the original one. Formally, the set of eigenvectors represent a natural basis in which to express the operator `A`, and "projecting" a phenomenon onto one or more of the eigenvectors of the operator that generates it highlights its symmetries (for enlightening examples and all the relevant theory, see e.g. the "modal expansion" in quantum mechanics/acoustics/photonics, Principal Component Analysis in statistics, etc.)
+
+
+## Vision
+
+Our aim with this library is manifold: to bring together functional programming and high-performance numerical computing, because either field deserves the other.
+
+We believe that dynamic languages do not completely address the needs of scientific programming: ease of design, verification and collaboration. Functional composition of sub-programs and rich, static types are the missing link between programmer efficiency and program expressiveness.
+ 
+
+
+## Installation
+
+* First of all, working installations of PETSc and SLEPc are required, in this order. Please refer to the respective pages for detailed instructions.
+
+* The Haskell side is based on `inline-c`, which can be obtained from Hackage.
 
 
 ## License
@@ -19,5 +36,5 @@ WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
 FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for
 more details.
 You should have received a copy of the GNU Lesser General Public License
-along with slepc-hs If not, see <http://www.gnu.org/licenses/>.
+along with slepc-hs. If not, see <http://www.gnu.org/licenses/>.
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
