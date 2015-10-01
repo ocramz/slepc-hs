@@ -121,6 +121,8 @@ withMatCreateSeqAIJVarNZPR comm nr nc nnz =
 
 
 
+matSetValues mat idxx idxy b im = chk0 $ matSetValues' mat idxx idxy b im
+
 
 
 

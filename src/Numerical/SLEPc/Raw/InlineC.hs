@@ -110,26 +110,30 @@ matGetOwnershipRange' mat =
 -- PetscErrorCode  MatSetValues(Mat mat,PetscInt m,const PetscInt idxm[],PetscInt n,const PetscInt idxn[],const PetscScalar v[],InsertMode addv)
 matSetValues0 mat nbx idxx_ nby idxy_ b_ im =
   [C.exp|int { MatSetValues($(Mat mat),
-                      $(int nbx),
+                      $(int nbxc),
                       $(int* idxx_),
-                      $(int nby),
+                      $(int nbyc),
                       $(int* idxy_),
                       $(PetscScalar* b_), $(int imm))} |] where
     imm = fromIntegral $ insertModeToInt im
+    nbxc = toCInt nbx
+    nbyc = toCInt nby
 
 
-matSetValues' mat idxx idxy b im
+matSetValues' mat idxx_ idxy_ b im
   | compatDim =
-     withArray idxx $ \idxx_ ->
-     withArray idxy $ \idxy_ ->
+     withArray idxxc $ \idxxp ->
+     withArray idxyc $ \idxyp ->
      withArray b $ \b_ ->
-     matSetValues0 mat nbx idxx_ nby idxy_ b_ im 
+     matSetValues0 mat nbx idxxp nby idxyp b_ im 
   | otherwise = error "matSetValues: incompatible dimensions"
   where
-       nbx = fromIntegral $ length idxx
-       nby = fromIntegral $ length idxy
+       nbx = length idxxc
+       nby = length idxyc
        nb = fromIntegral $ length b
        compatDim = (nbx*nby) == nb
+       idxxc = map toCInt idxx_
+       idxyc = map toCInt idxy_
 
 
 
