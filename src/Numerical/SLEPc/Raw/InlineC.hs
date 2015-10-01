@@ -32,6 +32,94 @@ C.include "<slepcsvd.h>"
 
 -- petscDecide = -1           -- don't ask
 
+data PetscJudge = PetscJ { unPetscJ :: CInt}
+{-# NOINLINE petscDecide #-}
+petscDecide = PetscJ $ unsafePerformIO [C.exp|int{PETSC_DECIDE}|]
+{-# NOINLINE petscDetermine #-}
+petscDetermine = PetscJ $ unsafePerformIO [C.exp|int{PETSC_DETERMINE}|]
+
+
+
+-- * Vec
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- * Mat
+
+
+matCreate' comm = withPtr $ \p -> [C.exp| int{MatCreate($(int c), $(Mat *p))} |] 
+  where c = unComm comm
+matCreate1 = matCreate' 
+
+matDestroy' m = [C.exp|int{MatDestroy($(Mat *m))}|]
+matDestroy1 m = with m matDestroy' 
+
+
+-- PetscErrorCode  MatCreateSeqAIJ(MPI_Comm comm,PetscInt m,PetscInt n,PetscInt nz,const PetscInt nnz[],Mat *A)  -- Collective on MPI_Comm
+-- Input Parameters :
+-- comm	- MPI communicator, set to PETSC_COMM_SELF
+-- m	- number of rows
+-- n	- number of columns
+-- nz	- number of nonzeros per row (same for all rows) (if nnz is given nz is ignored)
+-- nnz	- array containing the number of nonzeros in the various rows (possibly different for each row) or NULL
+-- Output Parameter :
+-- A -the matrix 
+
+matCreateSeqAIJ1 comm m' n' nnz' =
+  withPtr (\mat ->
+   withArray nnz $ \nnzp ->
+            [C.exp|int{MatCreateSeqAIJ($(int c),
+                                       $(PetscInt m),
+                                       $(PetscInt n),
+                                       0 ,
+                                       $(PetscInt* nnzp),
+                                       $(Mat *mat))}|]) 
+  where c = unComm comm
+        (m, n, nnz) = (toCInt m', toCInt n', map toCInt nnz')
+
+matCreateSeqAIJconstNZperRow1 comm m' n' nz' =
+  withPtr (\mat ->
+            [C.exp|int{MatCreateSeqAIJ($(int c),
+                                       $(PetscInt m),
+                                       $(PetscInt n),
+                                       $(PetscInt nz),
+                                       NULL ,
+                                       $(Mat *mat))}|]) 
+  where c = unComm comm
+        (m, n, nz) = (toCInt m', toCInt n', toCInt nz')
+
+-- PetscErrorCode  MatGetOwnershipRange(Mat mat,PetscInt *m,PetscInt *n)
+
+-- PetscErrorCode MatSetValue(Mat m,PetscInt row,PetscInt col,PetscScalar value,InsertMode mode)
+
+-- PetscErrorCode  MatSetValues(Mat mat,PetscInt m,const PetscInt idxm[],PetscInt n,const PetscInt idxn[],const PetscScalar v[],InsertMode addv)
+
+
+matViewStdout v view = [C.exp|int{MatView($(Mat v), PETSC_VIEWER_STDOUT_SELF)}|]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -84,6 +172,12 @@ epsSetDimensions' e nev ncv mpd = [C.exp|int{EPSSetDimensions($(EPS e),$(int nev
 
 epsSetInterval' e smin smax = [C.exp|int{EPSSetInterval($(EPS e),$(PetscReal smin),$(PetscReal smax))}|]
 
+-- | sets subspace (array of Vec's) from which EPSSolve starts to iterate
+-- PetscErrorCode EPSSetInitialSpace(EPS eps,PetscInt n,Vec *is)
+epsSetInitialSpace' e subspace = withArray subspace $ \isp -> 
+  [C.exp|int{EPSSetInitialSpace($(EPS e),$(int nc),$(Vec* isp))}|]
+    where nc = toCInt n
+          n = length subspace
 
 -- EPSDestroy(EPS eps);
 epsDestroy' e = with e $ \ep -> [C.exp|int{EPSDestroy($(EPS* ep))}|]

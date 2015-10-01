@@ -1,4 +1,7 @@
-module Numerical.SLEPc.Raw.PutGet where
+module Numerical.SLEPc.Raw.PutGet
+       -- (Comm, commWorld, commSelf,
+       --  Mat, Vec, EPS, SVD)
+       where
 
 import Numerical.SLEPc.Raw.InlineC
 import Numerical.SLEPc.Raw.Types
@@ -6,9 +9,13 @@ import Numerical.SLEPc.Raw.Utils
 import Numerical.SLEPc.Raw.Exception
 import Numerical.SLEPc.Raw.Internal
 
+import Foreign.C.Types
+
 import Control.Monad
 import Control.Concurrent
 import Control.Exception
+
+import Control.Arrow ((***),(&&&))
 
 
 -- * Vec
@@ -17,6 +24,76 @@ import Control.Exception
 
 
 -- * Mat
+
+
+
+withMat :: Comm -> (Mat -> IO a) -> IO a
+withMat comm = bracketChk (matCreate1 comm) matDestroy1
+
+matCreate comm = chk1 (matCreate1 comm)
+matDestroy = chk0 . matDestroy1
+
+data MatrixInfoBase =
+  MatrixInfoBase {matComm :: Comm,
+                  matRows :: !Int,
+                  matCols :: !Int}
+
+data MatrixInfo =
+  MIConstNZPR MatrixInfoBase !Int
+  | MIVarNZPR MatrixInfoBase ![Int]
+
+data PetscMatrix = PetscMatrix !MatrixInfo Mat
+
+validDims0 nr nc = nr > 0 && nc > 0 
+
+validDims' mi = validDims0 nr nc
+      where (nr, nc) = (matRows &&& matCols) mi
+
+validDims :: MatrixInfo -> Bool
+validDims (MIConstNZPR mi nz) = validDims' mi && nz > 0 && nz < matRows mi
+validDims (MIVarNZPR mi nnz) = validDims' mi && length nnz == matRows mi
+
+mkMatrixInfoBase comm nr nc
+  | validDims0 nr nc = MatrixInfoBase comm nr nc
+  | otherwise = error "mkMatrixInfoBase : matrix sizes must be > 0 "
+
+mkMatrixInfoConstNZPR comm nr nc = MIConstNZPR (mkMatrixInfoBase comm nr nc)
+mkMatrixInfoVarNZPR comm nr nc = MIVarNZPR (mkMatrixInfoBase comm nr nc)
+
+mkMatrix mi matcreatef
+  | validDims mi = do
+      m <- chk1 matcreatef
+      return $ PetscMatrix mi m
+  | otherwise = error "mkMatrix : invalid sizes : no matrix allocated"
+
+matCreateSeqAIJConstNZPR comm nr nc nz =
+  mkMatrix
+    (mkMatrixInfoConstNZPR comm nr nc nz)
+    (matCreateSeqAIJconstNZperRow1 comm nr nc nz)
+
+matCreateSeqAIJVarNZPR comm nr nc nnz =
+  mkMatrix
+    (mkMatrixInfoVarNZPR comm nr nc nnz)
+    (matCreateSeqAIJ1 comm nr nc nnz)
+
+matDestroyPM (PetscMatrix _ m) = matDestroy m
+
+
+-- -- | size- and memory- safe parallel CSR matrix brackets
+withMatCreateSeqAIJConstNZPR comm nr nc nz =
+  bracket (matCreateSeqAIJConstNZPR comm nr nc nz) matDestroyPM 
+
+withMatCreateSeqAIJVarNZPR comm nr nc nnz =
+  bracket (matCreateSeqAIJVarNZPR comm nr nc nnz) matDestroyPM
+
+
+
+
+
+
+
+
+
 
 
 
