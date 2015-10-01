@@ -29,10 +29,12 @@ withCStringArrayPtr ss f = withCStringArray ss $ \css -> with css f
 
 -- -- tuple unpacking stuff
 
--- fst2 :: (a, (b, c)) -> (a,b)
-fst2 = fst . snd
+
+fstOf2 = fst . snd
 -- snd2 :: (a, (b, c)) -> c
-snd2 =  snd . snd
+sndOf2 =  snd . snd
+
+fst2M (a, (b, _)) = return (a, b)
 
 both' f =  f *** f
 

@@ -99,10 +99,40 @@ matCreateSeqAIJconstNZperRow1 comm m' n' nz' =
         (m, n, nz) = (toCInt m', toCInt n', toCInt nz')
 
 -- PetscErrorCode  MatGetOwnershipRange(Mat mat,PetscInt *m,PetscInt *n)
+matGetOwnershipRange' mat = 
+  withPtr ( \m ->
+   withPtr $ \n ->
+    [C.exp|int{MatGetOwnershipRange($(Mat mat),$(int* m),$(int* n))}|] ) >>= \(a, (b, c)) -> return ((a, b), c)
+
 
 -- PetscErrorCode MatSetValue(Mat m,PetscInt row,PetscInt col,PetscScalar value,InsertMode mode)
 
 -- PetscErrorCode  MatSetValues(Mat mat,PetscInt m,const PetscInt idxm[],PetscInt n,const PetscInt idxn[],const PetscScalar v[],InsertMode addv)
+matSetValues0 mat nbx idxx_ nby idxy_ b_ im =
+  [C.exp|int { MatSetValues($(Mat mat),
+                      $(int nbx),
+                      $(int* idxx_),
+                      $(int nby),
+                      $(int* idxy_),
+                      $(PetscScalar* b_), $(int imm))} |] where
+    imm = fromIntegral $ insertModeToInt im
+
+
+matSetValues' mat idxx idxy b im
+  | compatDim =
+     withArray idxx $ \idxx_ ->
+     withArray idxy $ \idxy_ ->
+     withArray b $ \b_ ->
+     matSetValues0 mat nbx idxx_ nby idxy_ b_ im 
+  | otherwise = error "matSetValues: incompatible dimensions"
+  where
+       nbx = fromIntegral $ length idxx
+       nby = fromIntegral $ length idxy
+       nb = fromIntegral $ length b
+       compatDim = (nbx*nby) == nb
+
+
+
 
 
 matViewStdout v view = [C.exp|int{MatView($(Mat v), PETSC_VIEWER_STDOUT_SELF)}|]

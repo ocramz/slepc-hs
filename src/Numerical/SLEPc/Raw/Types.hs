@@ -146,6 +146,14 @@ fileModeToInt x = fromEnum (x :: PetscFileMode_)
 
 
 
+-- * InsertMode
+
+data InsertMode_ = NotSetValues | InsertValues | AddValues | MaxValues | InsertAllValues | AddAllValues | InsertBCValues | AddBCValues deriving (Eq, Enum, Show)
+
+insertModeToInt x = fromEnum (x :: InsertMode_) 
+
+
+
 -- * MPI
 
 
