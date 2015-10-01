@@ -59,9 +59,10 @@ validDims' mi = validDims0 nr nc
       where (nr, nc) = (matRows &&& matCols) mi
 
 validDims :: MatrixInfo -> Bool
-validDims (MIConstNZPR mi nz) = validDims' mi && nz > 0 && nz < matRows mi
+validDims (MIConstNZPR mi nz) = validDims' mi && nz >= 0 && nz <= matCols mi
 validDims (MIVarNZPR mi nnz) =
-  validDims' mi && length nnz == matRows mi && all (>= 0) nnz
+  validDims' mi && length nnz == matRows mi && all withinCols nnz where
+    withinCols x = x >= 0 && x <= matCols mi
 
 mkMatrixInfoBase comm nr nc
   | validDims0 nr nc = MatrixInfoBase comm nr nc
