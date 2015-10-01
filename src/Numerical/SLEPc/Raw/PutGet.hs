@@ -32,6 +32,7 @@ withMat comm = bracketChk (matCreate1 comm) matDestroy1
 
 matCreate comm = chk1 (matCreate1 comm)
 matDestroy = chk0 . matDestroy1
+matDestroyPM (PetscMatrix _ m) = matDestroy m
 
 data MatrixInfoBase =
   MatrixInfoBase {matComm :: Comm,
@@ -42,8 +43,16 @@ data MatrixInfo =
   MIConstNZPR MatrixInfoBase !Int
   | MIVarNZPR MatrixInfoBase ![Int]
 
+
+-- | a datatype encapsulating matrix information and the typed pointer
 data PetscMatrix = PetscMatrix !MatrixInfo Mat
 
+unPetscMatrix (PetscMatrix _ m) = m
+unPetscMatrixInfo (PetscMatrix mi _) = mi
+
+
+
+validDims0 :: Int -> Int -> Bool
 validDims0 nr nc = nr > 0 && nc > 0 
 
 validDims' mi = validDims0 nr nc
@@ -51,11 +60,13 @@ validDims' mi = validDims0 nr nc
 
 validDims :: MatrixInfo -> Bool
 validDims (MIConstNZPR mi nz) = validDims' mi && nz > 0 && nz < matRows mi
-validDims (MIVarNZPR mi nnz) = validDims' mi && length nnz == matRows mi
+validDims (MIVarNZPR mi nnz) =
+  validDims' mi && length nnz == matRows mi && all (>= 0) nnz
 
 mkMatrixInfoBase comm nr nc
   | validDims0 nr nc = MatrixInfoBase comm nr nc
-  | otherwise = error "mkMatrixInfoBase : matrix sizes must be > 0 "
+  | otherwise = error "mkMatrixInfoBase : matrix sizes must be > 0 " 
+
 
 mkMatrixInfoConstNZPR comm nr nc = MIConstNZPR (mkMatrixInfoBase comm nr nc)
 mkMatrixInfoVarNZPR comm nr nc = MIVarNZPR (mkMatrixInfoBase comm nr nc)
@@ -76,15 +87,31 @@ matCreateSeqAIJVarNZPR comm nr nc nnz =
     (mkMatrixInfoVarNZPR comm nr nc nnz)
     (matCreateSeqAIJ1 comm nr nc nnz)
 
-matDestroyPM (PetscMatrix _ m) = matDestroy m
+
+
+
 
 
 -- -- | size- and memory- safe parallel CSR matrix brackets
+
+-- | ", constant # of nonzeros / row
+
+withMatCreateSeqAIJConstNZPR ::
+  Comm -> Int -> Int -> Int ->
+  (PetscMatrix -> IO a) ->
+  IO a
 withMatCreateSeqAIJConstNZPR comm nr nc nz =
   bracket (matCreateSeqAIJConstNZPR comm nr nc nz) matDestroyPM 
 
+-- | ", variable # of nonzeros / row, specified in array nnz
+withMatCreateSeqAIJVarNZPR ::
+  Comm -> Int -> Int -> [Int] ->
+  (PetscMatrix -> IO a) ->
+  IO a
 withMatCreateSeqAIJVarNZPR comm nr nc nnz =
   bracket (matCreateSeqAIJVarNZPR comm nr nc nnz) matDestroyPM
+
+
 
 
 
