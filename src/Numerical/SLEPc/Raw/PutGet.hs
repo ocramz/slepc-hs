@@ -68,21 +68,26 @@ mkMatrixInfoBase comm nr nc
   | validDims0 nr nc = MatrixInfoBase comm nr nc
   | otherwise = error "mkMatrixInfoBase : matrix sizes must be > 0 " 
 
-
+mkMatrixInfoConstNZPR :: Comm -> Int -> Int -> Int -> MatrixInfo
 mkMatrixInfoConstNZPR comm nr nc = MIConstNZPR (mkMatrixInfoBase comm nr nc)
+
+mkMatrixInfoVarNZPR :: Comm -> Int -> Int -> [Int] -> MatrixInfo
 mkMatrixInfoVarNZPR comm nr nc = MIVarNZPR (mkMatrixInfoBase comm nr nc)
 
+mkMatrix :: (Num a, Eq a) => MatrixInfo -> IO (Mat, a) -> IO PetscMatrix
 mkMatrix mi matcreatef
   | validDims mi = do
       m <- chk1 matcreatef
       return $ PetscMatrix mi m
   | otherwise = error "mkMatrix : invalid sizes : no matrix allocated"
 
+matCreateSeqAIJConstNZPR :: Comm -> Int -> Int -> Int -> IO PetscMatrix
 matCreateSeqAIJConstNZPR comm nr nc nz =
   mkMatrix
     (mkMatrixInfoConstNZPR comm nr nc nz)
     (matCreateSeqAIJconstNZperRow1 comm nr nc nz)
 
+matCreateSeqAIJVarNZPR :: Comm -> Int -> Int -> [Int] -> IO PetscMatrix
 matCreateSeqAIJVarNZPR comm nr nc nnz =
   mkMatrix
     (mkMatrixInfoVarNZPR comm nr nc nnz)
