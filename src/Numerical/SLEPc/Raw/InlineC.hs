@@ -136,7 +136,7 @@ matSetValuesUnsafe' mat idxx_ idxy_ b im=
 
 
 
-matViewStdout v view = [C.exp|int{MatView($(Mat v), PETSC_VIEWER_STDOUT_SELF)}|]
+matViewStdout' v = [C.exp|int{MatView($(Mat v), PETSC_VIEWER_STDOUT_SELF)}|]
 
 
 

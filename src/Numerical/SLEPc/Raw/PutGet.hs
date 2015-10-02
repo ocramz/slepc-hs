@@ -194,7 +194,7 @@ matSetValuesSafeV pm idxx idxy b im
 
 inBoundsV_ ib = V.all (inBounds ib)
 
-
+matViewStdout = chk0 . matViewStdout'
 
 
 
