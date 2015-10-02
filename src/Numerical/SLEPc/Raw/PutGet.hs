@@ -120,8 +120,8 @@ withMatCreateSeqAIJVarNZPR comm nr nc nnz =
 
 
 
-
-matSetValues mat idxx idxy b im = chk0 $ matSetValues' mat idxx idxy b im
+matSetValuesUnsafe :: Mat -> [Int] -> [Int] -> [PetscScalar_] -> InsertMode_ -> IO ()
+matSetValuesUnsafe mat idxx idxy b im = chk0 $ matSetValues' mat idxx idxy b im
 
 
 
