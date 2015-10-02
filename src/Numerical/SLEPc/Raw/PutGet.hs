@@ -55,8 +55,19 @@ data MatrixInfo =
 -- | a datatype encapsulating matrix information and the typed pointer
 data PetscMatrix = PetscMatrix !MatrixInfo Mat
 
-unPetscMatrix (PetscMatrix _ m) = m
-unPetscMatrixInfo (PetscMatrix mi _) = mi
+
+petscMatrixBounds pm = petscMatrixInfoBBounds (petscMatrixInfoB pm) where
+ petscMatrixInfoBBounds mi = (ibx, iby) where
+  ibx = (0, matRows mi - 1) :: (Int, Int)
+  iby = (0, matCols mi - 1) :: (Int, Int)
+
+petscMatrixInfoB :: PetscMatrix -> MatrixInfoBase
+petscMatrixInfoB (PetscMatrix (MIConstNZPR mi _) _) = mi
+
+petscMatrixMat :: PetscMatrix -> Mat
+petscMatrixMat (PetscMatrix (MIConstNZPR _ _ ) m) = m
+
+
 
 
 
@@ -145,9 +156,11 @@ matSetValuesUnsafe mat idxx idxy b im = chk0 $ matSetValuesUnsafe' mat idxx idxy
 inBounds (imin, imax) i = i >= imin && i <= imax
 inBounds_ ib = all (inBounds ib)
 
-inBoundsV_ ib = V.all (inBounds ib)
 
 
+
+matSetValuesSafe ::
+  PetscMatrix -> [Int] -> [Int] -> [PetscScalar_] -> InsertMode_ -> IO ()
 matSetValuesSafe pm idxx idxy b im 
   | validIdxs && compatLengths = matSetValuesUnsafe m idxx idxy b im
   | otherwise = error "matSetValuesSafe : incompatible dimensions"
@@ -159,23 +172,13 @@ matSetValuesSafe pm idxx idxy b im
       validIdxs = inBounds_ ibx idxx && inBounds_ iby idxy
 
 
-
-
-petscMatrixBounds pm = petscMatrixInfoBBounds (petscMatrixInfoB pm) where
- petscMatrixInfoBBounds mi = (ibx, iby) where
-  ibx = (0, matRows mi - 1) :: (Int, Int)
-  iby = (0, matCols mi - 1) :: (Int, Int)
-
-petscMatrixInfoB (PetscMatrix (MIConstNZPR mi _) _) = mi
-petscMatrixMat (PetscMatrix (MIConstNZPR _ _ ) m) = m
-
-
-
-
-
-
-
-
+matSetValuesSafeV ::
+  PetscMatrix ->
+  V.Vector Int ->
+  V.Vector Int ->
+  V.Vector PetscScalar_ ->
+  InsertMode_ ->
+  IO ()
 matSetValuesSafeV pm idxx idxy b im 
   | validIdxs && compatLengths = matSetValuesUnsafe m idxxa idxya ba im
   | otherwise = error "matSetValuesSafe : incompatible dimensions"
@@ -189,6 +192,7 @@ matSetValuesSafeV pm idxx idxy b im
       idxya = V.toList idxy
       ba = V.toList b
 
+inBoundsV_ ib = V.all (inBounds ib)
 
 
 
