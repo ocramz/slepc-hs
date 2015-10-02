@@ -5,9 +5,13 @@ import Numerical.SLEPc.Raw.PutGet
 import Numerical.SLEPc.Raw.Types
 
 
-t1' = withMatCreateSeqAIJVarNZPR cw 3 3 [1,1,1] $ \pm -> do
+t1' = withMatCreateSeqAIJConstNZPR cw 3 3 1 $ \pm -> do
   let m = petscMatrixMat pm
+  matNewNZallocErrorOff m
+  matSetup m
   matSetValuesSafe pm [0,1,2] [0,1,2] (replicate 3 pi) InsertValues
+
+  matAssembly m
   matViewStdout m
     where
       cw = commWorld

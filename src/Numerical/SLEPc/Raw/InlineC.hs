@@ -28,6 +28,7 @@ context slepcCtx
 
 C.include "<slepceps.h>"
 C.include "<slepcsvd.h>"
+C.include "<petscmat.h>"
 
 
 -- petscDecide = -1           -- don't ask
@@ -63,6 +64,26 @@ matCreate1 = matCreate'
 
 matDestroy' m = [C.exp|int{MatDestroy($(Mat *m))}|]
 matDestroy1 m = with m matDestroy' 
+
+matSetup' m = [C.exp|int{MatSetUp($(Mat m))}|]
+
+
+-- MatSetOption(A, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE)
+matNewNZallocError' a q =
+  [C.exp|int{MatSetOption($(Mat a), MAT_NEW_NONZERO_ALLOCATION_ERR, $(PetscBool q))}|]
+
+matNewNZallocErrorOff' a =
+  [C.exp|int{MatSetOption($(Mat a), MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE)}|]
+
+-- -- assembly:
+-- --   type of assembly, either MAT_FLUSH_ASSEMBLY or MAT_FINAL_ASSEMBLY
+
+-- PetscErrorCode  MatAssemblyBegin(Mat mat,MatAssemblyType type)
+matAssemblyBegin' m = [C.exp|int{MatAssemblyBegin($(Mat m), MAT_FINAL_ASSEMBLY)}|]
+
+-- PetscErrorCode  MatAssemblyEnd(Mat mat,MatAssemblyType type)
+matAssemblyEnd' m = [C.exp|int{MatAssemblyEnd($(Mat m), MAT_FINAL_ASSEMBLY)}|]
+
 
 
 -- PetscErrorCode  MatCreateSeqAIJ(MPI_Comm comm,PetscInt m,PetscInt n,PetscInt nz,const PetscInt nnz[],Mat *A)  -- Collective on MPI_Comm

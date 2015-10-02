@@ -40,6 +40,26 @@ matCreate comm = chk1 (matCreate1 comm)
 matDestroy :: Mat -> IO ()
 matDestroy = chk0 . matDestroy1
 
+matSetup = chk0 . matSetup'
+
+
+matAssemblyBegin = chk0 . matAssemblyBegin'
+matAssemblyEnd = chk0 . matAssemblyEnd'
+
+matAssembly = matAssemblyBegin >> matAssemblyEnd
+
+withMatAssembly m f = do
+  matAssemblyBegin m
+  f 
+  matAssemblyEnd m
+
+
+
+-- matNewNZallocError' a q
+matNewNZallocError a q = chk0 (matNewNZallocError' a q)
+
+matNewNZallocErrorOff = matNewNZallocErrorOff'
+
 matDestroyPM (PetscMatrix _ m) = matDestroy m
 
 data MatrixInfoBase =
@@ -63,9 +83,11 @@ petscMatrixBounds pm = petscMatrixInfoBBounds (petscMatrixInfoB pm) where
 
 petscMatrixInfoB :: PetscMatrix -> MatrixInfoBase
 petscMatrixInfoB (PetscMatrix (MIConstNZPR mi _) _) = mi
+petscMatrixInfoB (PetscMatrix (MIVarNZPR mi _) _) = mi
 
 petscMatrixMat :: PetscMatrix -> Mat
 petscMatrixMat (PetscMatrix (MIConstNZPR _ _ ) m) = m
+petscMatrixMat (PetscMatrix (MIVarNZPR _ _ ) m) = m
 
 
 
