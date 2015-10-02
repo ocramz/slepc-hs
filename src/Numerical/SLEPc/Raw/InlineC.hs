@@ -119,19 +119,16 @@ matSetValues0 mat nbx idxx_ nby idxy_ b_ im =
     nbxc = toCInt nbx
     nbyc = toCInt nby
 
-
-matSetValues' mat idxx_ idxy_ b im
-  | compatDim =
+matSetValuesUnsafe' ::
+  Mat -> [Int] -> [Int] -> [PetscScalar_] -> InsertMode_ -> IO CInt
+matSetValuesUnsafe' mat idxx_ idxy_ b im=
      withArray idxxc $ \idxxp ->
      withArray idxyc $ \idxyp ->
      withArray b $ \b_ ->
      matSetValues0 mat nbx idxxp nby idxyp b_ im 
-  | otherwise = error "matSetValues: incompatible dimensions"
   where
        nbx = length idxxc
        nby = length idxyc
-       nb = fromIntegral $ length b
-       compatDim = (nbx*nby) == nb
        idxxc = map toCInt idxx_
        idxyc = map toCInt idxy_
 

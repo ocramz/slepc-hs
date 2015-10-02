@@ -1,3 +1,4 @@
+{-# LANGUAGE MultiParamTypeClasses, TypeSynonymInstances, FlexibleInstances #-}
 module Numerical.SLEPc.Raw.PutGet
        -- (Comm, commWorld, commSelf,
        --  Mat, Vec, EPS, SVD)
@@ -17,6 +18,9 @@ import Control.Exception
 
 import Control.Arrow ((***),(&&&))
 
+import qualified Data.Graph as G
+import qualified Data.Vector as V
+
 
 -- * Vec
 
@@ -30,8 +34,12 @@ import Control.Arrow ((***),(&&&))
 withMat :: Comm -> (Mat -> IO a) -> IO a
 withMat comm = bracketChk (matCreate1 comm) matDestroy1
 
+matCreate :: Comm -> IO Mat
 matCreate comm = chk1 (matCreate1 comm)
+
+matDestroy :: Mat -> IO ()
 matDestroy = chk0 . matDestroy1
+
 matDestroyPM (PetscMatrix _ m) = matDestroy m
 
 data MatrixInfoBase =
@@ -55,6 +63,7 @@ unPetscMatrixInfo (PetscMatrix mi _) = mi
 validDims0 :: Int -> Int -> Bool
 validDims0 nr nc = nr > 0 && nc > 0 
 
+validDims' :: MatrixInfoBase -> Bool
 validDims' mi = validDims0 nr nc
       where (nr, nc) = (matRows &&& matCols) mi
 
@@ -120,8 +129,65 @@ withMatCreateSeqAIJVarNZPR comm nr nc nnz =
 
 
 
-matSetValuesUnsafe :: Mat -> [Int] -> [Int] -> [PetscScalar_] -> InsertMode_ -> IO ()
-matSetValuesUnsafe mat idxx idxy b im = chk0 $ matSetValues' mat idxx idxy b im
+matSetValuesUnsafe ::
+  Mat ->
+  [Int] ->             -- x indices
+  [Int] ->             -- y indices
+  [PetscScalar_] ->    -- values 
+  InsertMode_ ->       -- `InsertValues` or `AddValues`
+  IO ()
+matSetValuesUnsafe mat idxx idxy b im = chk0 $ matSetValuesUnsafe' mat idxx idxy b im
+
+
+
+
+
+inBounds (imin, imax) i = i >= imin && i <= imax
+inBounds_ ib = all (inBounds ib)
+
+inBoundsV_ ib = V.all (inBounds ib)
+
+
+matSetValuesSafe pm idxx idxy b im 
+  | validIdxs && compatLengths = matSetValuesUnsafe m idxx idxy b im
+  | otherwise = error "matSetValuesSafe : incompatible dimensions"
+     where
+      (ibx, iby) = petscMatrixBounds pm
+      m = petscMatrixMat pm
+      (lix, liy, lb) = (length idxx, length idxy, length b)
+      compatLengths = (lix == liy) && (lix == lb)
+      validIdxs = inBounds_ ibx idxx && inBounds_ iby idxy
+
+
+
+
+petscMatrixBounds pm = petscMatrixInfoBBounds (petscMatrixInfoB pm) where
+ petscMatrixInfoBBounds mi = (ibx, iby) where
+  ibx = (0, matRows mi - 1) :: (Int, Int)
+  iby = (0, matCols mi - 1) :: (Int, Int)
+
+petscMatrixInfoB (PetscMatrix (MIConstNZPR mi _) _) = mi
+petscMatrixMat (PetscMatrix (MIConstNZPR _ _ ) m) = m
+
+
+
+
+
+
+
+
+matSetValuesSafeV pm idxx idxy b im 
+  | validIdxs && compatLengths = matSetValuesUnsafe m idxxa idxya ba im
+  | otherwise = error "matSetValuesSafe : incompatible dimensions"
+     where
+      (ibx, iby) = petscMatrixBounds pm
+      m = petscMatrixMat pm
+      (lix, liy, lb) = (V.length idxx, V.length idxy, V.length b)
+      compatLengths = (lix == liy) && (lix == lb)
+      validIdxs = inBoundsV_ ibx idxx && inBoundsV_ iby idxy
+      idxxa = V.toList idxx
+      idxya = V.toList idxy
+      ba = V.toList b
 
 
 
