@@ -29,4 +29,8 @@ step3:
 	ghci ${SRCDIR}/TestMain.hs ${SRCDIR}/Raw/InlineC.hs  ${LIBDIR}/InlineC_c.o  ${LIBDIR}/Internal_c.o -isrc/ -L${SLEPC_DIR_ARCH}/lib -L${PETSC_DIR_ARCH}/lib -lslepc -lmpich
 
 
+reload:
+	make step3
+
+
 
