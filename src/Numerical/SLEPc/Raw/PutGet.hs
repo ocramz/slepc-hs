@@ -160,6 +160,10 @@ withMatCreateSeqAIJVarNZPR comm nr nc nnz =
   bracket (matCreateSeqAIJVarNZPR comm nr nc nnz) matDestroyPM
 
 
+
+-- -- -- setting matrix values
+
+
 matSetValueUnsafe ::
   Mat -> Int -> Int -> PetscScalar_ -> InsertMode_ -> IO ()
 matSetValueUnsafe m ix iy v im = chk0 $ matSetValueUnsafe' m ix iy v im
@@ -168,7 +172,7 @@ matSetValueSafe ::
   PetscMatrix -> Int -> Int -> PetscScalar_ -> InsertMode_ -> IO ()
 matSetValueSafe pm ix iy v im
   | validIdxs = matSetValueUnsafe m ix iy v im
-  | otherwise = error "matSetValueSafe: invalid indices" where
+  | otherwise = error "matSetValueSafe : incompatible indices" where
      validIdxs = inBounds ibx ix && inBounds iby iy
      (ibx, iby) = petscMatrixBounds pm
      m = petscMatrixMat pm
@@ -177,7 +181,7 @@ matSetValueArraySafe ::
   PetscMatrix -> [Int] -> [Int] -> [PetscScalar_] -> InsertMode_ -> IO ()
 matSetValueArraySafe pm idxx idxy b im
   | matValidIdxs pm idxx idxy b = mapM_ (\(ix, iy, v) -> matSetValueUnsafe m ix iy v im) ixy_
-  | otherwise = error "matSetValueArraySafe: incompatible indices"
+  | otherwise = error "matSetValueArraySafe : incompatible indices"
     where
       ixy_ = zip3 idxx idxy b
       m = petscMatrixMat pm
@@ -215,7 +219,7 @@ matSetValuesSafe ::
   PetscMatrix -> [Int] -> [Int] -> [PetscScalar_] -> InsertMode_ -> IO ()
 matSetValuesSafe pm idxx idxy b im 
   | matValidIdxs pm idxx idxy b = matSetValuesUnsafe m idxx idxy b im
-  | otherwise = error "matSetValuesSafe : incompatible dimensions"
+  | otherwise = error "matSetValuesSafe : incompatible indices"
      where
       m = petscMatrixMat pm
 
@@ -229,7 +233,7 @@ matSetValuesSafeV ::
   IO ()
 matSetValuesSafeV pm idxx idxy b im 
   | matValidIdxsV pm idxx idxy b = matSetValuesUnsafe m idxxa idxya ba im
-  | otherwise = error "matSetValuesSafe : incompatible dimensions"
+  | otherwise = error "matSetValuesSafe : incompatible indices"
      where
       m = petscMatrixMat pm
       idxxa = V.toList idxx
