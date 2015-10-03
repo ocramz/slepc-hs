@@ -173,10 +173,29 @@ matSetValueSafe pm ix iy v im
      (ibx, iby) = petscMatrixBounds pm
      m = petscMatrixMat pm
 
-matSetValueArraySafe pm ix_ iy_ v_ im =
-  mapM_ (\(ix, iy, v) -> matSetValueSafe pm ix iy v im) ixy_
+matSetValueArraySafe ::
+  PetscMatrix -> [Int] -> [Int] -> [PetscScalar_] -> InsertMode_ -> IO ()
+matSetValueArraySafe pm idxx idxy b im
+  | matValidIdxs pm idxx idxy b = mapM_ (\(ix, iy, v) -> matSetValueUnsafe m ix iy v im) ixy_
+  | otherwise = error "matSetValueArraySafe: incompatible indices"
     where
-      ixy_ = zip3 ix_ iy_ v_
+      ixy_ = zip3 idxx idxy b
+      m = petscMatrixMat pm
+
+
+matValidIdxs pm idxx idxy b =
+  inBounds_ ibx idxx && inBounds_ iby idxy && compatLengths
+    where
+     (ibx, iby) = petscMatrixBounds pm
+     (lix, liy, lb) = (length idxx, length idxy, length b)
+     compatLengths = (lix == liy) && (lix == lb)
+
+matValidIdxsV pm idxx idxy b =
+  inBoundsV_ ibx idxx && inBoundsV_ iby idxy && compatLengths
+    where
+     (ibx, iby) = petscMatrixBounds pm
+     (lix, liy, lb) = (V.length idxx, V.length idxy, V.length b)
+     compatLengths = (lix == liy) && (lix == lb)
 
 
 inBounds (imin, imax) i = i >= imin && i <= imax
@@ -195,14 +214,10 @@ matSetValuesUnsafe mat idxx idxy b im = chk0 $ matSetValuesUnsafe' mat idxx idxy
 matSetValuesSafe ::
   PetscMatrix -> [Int] -> [Int] -> [PetscScalar_] -> InsertMode_ -> IO ()
 matSetValuesSafe pm idxx idxy b im 
-  | validIdxs && compatLengths = matSetValuesUnsafe m idxx idxy b im
+  | matValidIdxs pm idxx idxy b = matSetValuesUnsafe m idxx idxy b im
   | otherwise = error "matSetValuesSafe : incompatible dimensions"
      where
-      (ibx, iby) = petscMatrixBounds pm
       m = petscMatrixMat pm
-      (lix, liy, lb) = (length idxx, length idxy, length b)
-      compatLengths = (lix == liy) && (lix == lb)
-      validIdxs = inBounds_ ibx idxx && inBounds_ iby idxy
 
 
 matSetValuesSafeV ::
@@ -213,14 +228,10 @@ matSetValuesSafeV ::
   InsertMode_ ->
   IO ()
 matSetValuesSafeV pm idxx idxy b im 
-  | validIdxs && compatLengths = matSetValuesUnsafe m idxxa idxya ba im
+  | matValidIdxsV pm idxx idxy b = matSetValuesUnsafe m idxxa idxya ba im
   | otherwise = error "matSetValuesSafe : incompatible dimensions"
      where
-      (ibx, iby) = petscMatrixBounds pm
       m = petscMatrixMat pm
-      (lix, liy, lb) = (V.length idxx, V.length idxy, V.length b)
-      compatLengths = (lix == liy) && (lix == lb)
-      validIdxs = inBoundsV_ ibx idxx && inBoundsV_ iby idxy
       idxxa = V.toList idxx
       idxya = V.toList idxy
       ba = V.toList b

@@ -18,12 +18,13 @@ t1' = withMatCreateSeqAIJVarNZPR cw 3 3 [1,1,1] $ \pm -> do
 t1 = withSlepc0 t1'
 
 
-t2' = withMatCreateSeqAIJConstNZPR cw 3 3 1 $ \pm -> do
+t2' = withMatCreateSeqAIJConstNZPR cw 3 3 3 $ \pm -> do
   let m = petscMatrixMat pm
   matNewNZallocErrorOff m
   matSetup m
   -- matSetValueSafe pm 1 1 pi InsertValues
-  matSetValueArraySafe pm [0,1,2] [0,1,2] (replicate 3 pi) InsertValues
+  -- matSetValueArraySafe pm [0,1,2] [0,1,2] (replicate 3 pi) InsertValues
+  matSetValueArraySafe pm [0,0,0,1,1,1,2,2,2] [0,1,2,0,1,2,0,1,2] (replicate 9 pi) InsertValues
   matAssembly m
   matViewStdout m
     where
