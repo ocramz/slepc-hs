@@ -15,6 +15,7 @@ import Foreign.C.Types
 
 slepcErrCodeFromInt n =
   case n of 0 -> NoError
+            256 -> NoError  -- w t f does this work
             _ -> SomeError 
 
 data SlepcErrCode_ = NoError | SomeError  deriving (Eq, Show, Typeable)

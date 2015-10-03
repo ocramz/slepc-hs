@@ -160,7 +160,27 @@ withMatCreateSeqAIJVarNZPR comm nr nc nnz =
   bracket (matCreateSeqAIJVarNZPR comm nr nc nnz) matDestroyPM
 
 
+matSetValueUnsafe ::
+  Mat -> Int -> Int -> PetscScalar_ -> InsertMode_ -> IO ()
+matSetValueUnsafe m ix iy v im = chk0 $ matSetValueUnsafe' m ix iy v im
 
+matSetValueSafe ::
+  PetscMatrix -> Int -> Int -> PetscScalar_ -> InsertMode_ -> IO ()
+matSetValueSafe pm ix iy v im
+  | validIdxs = matSetValueUnsafe m ix iy v im
+  | otherwise = error "matSetValueSafe: invalid indices" where
+     validIdxs = inBounds ibx ix && inBounds iby iy
+     (ibx, iby) = petscMatrixBounds pm
+     m = petscMatrixMat pm
+
+matSetValueArraySafe pm ix_ iy_ v_ im =
+  mapM_ (\(ix, iy, v) -> matSetValueSafe pm ix iy v im) ixy_
+    where
+      ixy_ = zip3 ix_ iy_ v_
+
+
+inBounds (imin, imax) i = i >= imin && i <= imax
+inBounds_ ib = all (inBounds ib)
 
 matSetValuesUnsafe ::
   Mat ->
@@ -170,15 +190,6 @@ matSetValuesUnsafe ::
   InsertMode_ ->       -- `InsertValues` or `AddValues`
   IO ()
 matSetValuesUnsafe mat idxx idxy b im = chk0 $ matSetValuesUnsafe' mat idxx idxy b im
-
-
-
-
-
-inBounds (imin, imax) i = i >= imin && i <= imax
-inBounds_ ib = all (inBounds ib)
-
-
 
 
 matSetValuesSafe ::

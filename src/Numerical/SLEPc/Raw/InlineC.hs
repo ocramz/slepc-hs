@@ -127,6 +127,12 @@ matGetOwnershipRange' mat =
 
 
 -- PetscErrorCode MatSetValue(Mat m,PetscInt row,PetscInt col,PetscScalar value,InsertMode mode)
+matSetValueUnsafe' m row col val im =
+  [C.exp|int{MatSetValue($(Mat m),$(int rowc),$(int colc),$(PetscScalar val),$(int imm))}|] where
+    imm = fromIntegral $ insertModeToInt im
+    rowc = toCInt row
+    colc = toCInt col
+    
 
 -- PetscErrorCode  MatSetValues(Mat mat,PetscInt m,const PetscInt idxm[],PetscInt n,const PetscInt idxn[],const PetscScalar v[],InsertMode addv)
 matSetValues0 mat nbx idxx_ nby idxy_ b_ im =
